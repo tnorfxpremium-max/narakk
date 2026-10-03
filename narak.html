@@ -1,15 +1,24 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>คลังโจทย์</title>
+<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>คลังโจทย์</title>
 <style>
-body{font-family:"Sarabun","Noto Sans Thai",sans-serif;font-size:20px;max-width:900px;margin:0 auto;padding:16px;background:#fafafa;color:#222}
-#s{position:sticky;top:0;width:100%;box-sizing:border-box;font-size:22px;padding:12px;border:2px solid #4a7;border-radius:10px;margin-bottom:6px}
-#n{color:#666;font-size:16px;margin:6px 0 12px}
-.c{background:#fff;border:1px solid #ddd;border-radius:10px;padding:12px 16px;margin-bottom:10px}
+:root{--bg:#fafafa;--fg:#222;--card:#fff;--bd:#ddd;--mut:#666;--ans:#0a7a3d;--mark:#ffe566;--markfg:#222;--inp:#fff;--acc:#4a7;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{font-family:"Sarabun","Noto Sans Thai",sans-serif;font-size:20px;max-width:900px;margin:0 auto;padding:16px;background:var(--bg);color:var(--fg);transition:background .25s,color .25s}
+#bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:10px;align-items:stretch;background:var(--bg);padding:6px 0;margin-bottom:6px}
+#s{flex:1;min-width:0;box-sizing:border-box;font:inherit;font-size:22px;padding:12px;border:2px solid var(--acc);border-radius:10px;background:var(--inp);color:var(--fg)}
+#t{flex:none;font:inherit;font-size:22px;font-weight:700;padding:0 18px;min-width:64px;border:2px solid var(--acc);border-radius:10px;background:var(--card);color:var(--fg);cursor:pointer;display:flex;align-items:center;gap:8px}
+#t .i{font-size:30px;line-height:1}
+@media (max-width:480px){#t .tx{display:none}}
+#n{color:var(--mut);font-size:16px;margin:6px 0 12px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-bottom:10px;transition:background .25s,border-color .25s}
 .q{font-weight:600}
-.a{margin-top:6px;color:#0a7a3d;font-weight:700;font-size:22px}
+.a{margin-top:6px;color:var(--ans);font-weight:700;font-size:22px}
 .a:before{content:"✅ "}
-mark{background:#ffe566}
+mark{background:var(--mark);color:var(--markfg)}
 </style></head><body>
-<input id="s" placeholder="พิมพ์ค้นหาโจทย์หรือคำตอบ..." autofocus>
+<div id="bar"><input id="s" placeholder="พิมพ์ค้นหาโจทย์หรือคำตอบ..." autofocus><button id="t" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span><span class="tx"></span></button></div>
 <div id="n"></div>
 <div id="l">
 <div class="c"><div class="q">Morroc มีภูมิอากาศแบบใด?</div><div class="a">ภูมิอากาศแบบทะเลทรายเขตร้อน</div></div>
@@ -512,4 +521,12 @@ function f(){const k=s.value.trim().toLowerCase();let m=0;
 cs.forEach(c=>{const ok=!k||c.textContent.toLowerCase().includes(k);c.style.display=ok?'':'none';if(ok)m++});
 n.textContent='แสดง '+m+' / '+cs.length+' ข้อ'}
 s.addEventListener('input',f);f();
-</script></body></html>
+</script><script>
+(function(){var r=document.documentElement,b=document.getElementById('t'),mq=matchMedia('(prefers-color-scheme: dark)');
+try{var v=localStorage.getItem('theme');if(v==='dark'||v==='light')r.setAttribute('data-theme',v)}catch(e){}
+function dark(){var a=r.getAttribute('data-theme');return a?a==='dark':mq.matches}
+function ui(){var d=dark();b.querySelector('.i').textContent=d?'☀️':'🌙';b.querySelector('.tx').textContent=d?'สว่าง':'มืด'}
+b.onclick=function(){var n=dark()?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}ui()};
+mq.addEventListener&&mq.addEventListener('change',ui);ui()})();
+</script>
+</body></html>
