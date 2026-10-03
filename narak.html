@@ -1,8 +1,8 @@
 <!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>คลังโจทย์</title>
 <style>
-:root{--bg:#fafafa;--fg:#222;--card:#fff;--bd:#ddd;--mut:#666;--ans:#0a7a3d;--mark:#ffe566;--markfg:#222;--inp:#fff;--acc:#4a7;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;color-scheme:dark}
+:root{--bg:#fafafa;--fg:#222;--card:#fff;--bd:#ddd;--mut:#666;--ans:#0a7a3d;--mark:#ffe566;--markfg:#222;--inp:#fff;--acc:#4a7;--hi:#e8f6ee;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;--hi:#173626;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101316;--fg:#ececec;--card:#1b2026;--bd:#323941;--mut:#9aa4ad;--ans:#4ade80;--mark:#8a7400;--markfg:#fff;--inp:#1b2026;--acc:#4ade80;--hi:#173626;color-scheme:dark}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{font-family:"Sarabun","Noto Sans Thai",sans-serif;font-size:20px;max-width:900px;margin:0 auto;padding:16px;background:var(--bg);color:var(--fg);transition:background .25s,color .25s}
@@ -22,6 +22,8 @@ mark{background:var(--mark);color:var(--markfg)}
 .a{margin:8px 0 0;font-size:34px;line-height:1.25}
 .q{font-weight:600;font-size:20px;color:var(--fg)}
 .c{padding:14px 18px}
+.c.top{border:2px solid var(--acc);background:var(--hi)}
+.sec{font-size:16px;font-weight:700;color:var(--mut);margin:14px 0 8px}
 </style></head><body>
 <div id="bar"><input id="s" placeholder="กรอกคีย์เวิร์ด" autofocus><button id="x" type="button" aria-label="ล้างคำค้น">✕</button><button id="t" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span><span class="tx"></span></button></div>
 <div id="n"></div>
@@ -528,12 +530,16 @@ const alt={x:'[x×*]','*':'[x×*]','×':'[x×*]','/':'[/÷]','÷':'[/÷]','-':'[
 const pat=t=>[...t.replace(/\s+/g,'')].map(ch=>alt[ch.toLowerCase()]||esc(ch)).join('\\s*');
 function hl(p,t,rs){const re=new RegExp('('+rs.map(z=>z.source).join('|')+')','gi');
 t.split(re).forEach((part,i)=>{if(i%2){const m=document.createElement('mark');m.textContent=part;p.appendChild(m)}else p.appendChild(document.createTextNode(part))})}
+function card(d,rs,top){const c=document.createElement('div');c.className='c'+(top?' top':'');const a=document.createElement('div');a.className='a';a.textContent=d.a;const q=document.createElement('div');q.className='q';if(rs)hl(q,d.q,rs);else q.textContent=d.q;c.append(q,a);return c}
+function sec(m){const e=document.createElement('div');e.className='sec';e.textContent=m;L.appendChild(e)}
 function f(){const raw=s.value.trim(),ks=raw.split(/\s+/).filter(Boolean);L.textContent='';x.style.visibility=s.value?'visible':'hidden';
-if(!ks.length){n.textContent='พิมคีย์เวิร์ดโจทย์ที่จะหา โจทย์มี(ทั้งหมด '+D.length+' ข้อ)';return}
-const one=new RegExp(pat(raw),'i');let rs=[one],r=D.filter(d=>one.test(d.q));
-if(!r.length){rs=ks.map(k=>new RegExp(pat(k),'i'));r=D.filter(d=>rs.every(z=>z.test(d.q)))}
-n.textContent=r.length?(r.length>MAX?'พบ '+r.length+' ข้อ แสดง '+MAX+' ข้อแรก — พิมพ์เพิ่มเพื่อให้แคบลง':'พบ '+r.length+' ข้อ'):'ไม่พบ ลองพิมพ์คำอื่น';
-r.slice(0,MAX).forEach(d=>{const c=document.createElement('div');c.className='c';const a=document.createElement('div');a.className='a';a.textContent=d.a;const q=document.createElement('div');q.className='q';hl(q,d.q,rs);c.append(q,a);L.appendChild(c)})}
+if(!ks.length){n.textContent='โจทย์ทั้งหมด '+D.length+' ข้อ — พิมพ์คีย์เวิร์ดเพื่อค้นหา';D.forEach(d=>L.appendChild(card(d,null,false)));return}
+const one=new RegExp(pat(raw),'i'),rs=ks.map(k=>new RegExp(pat(k),'i')),r=[];
+D.forEach(d=>{if(!rs.every(z=>z.test(d.q)))return;const m=one.exec(d.q);r.push({d:d,t:m?0:1,i:m?m.index:Math.min(...rs.map(z=>z.exec(d.q).index))})});
+r.sort((p,q)=>p.t-q.t||p.i-q.i||p.d.q.length-q.d.q.length);
+const big=r.length>MAX,hs=[one,...rs];
+n.textContent=r.length?(big?'พบ '+r.length+' ข้อ — แสดงทั้งหมด เรียงข้อที่ตรงที่สุดไว้บนสุด':'พบ '+r.length+' ข้อ'):'ไม่พบ ลองพิมพ์คำอื่น';
+r.forEach((o,i)=>{if(big&&i===0)sec('⭐ ตรงที่สุด '+MAX+' ข้อแรก');if(big&&i===MAX)sec('ข้ออื่นที่เกี่ยวข้อง ('+(r.length-MAX)+' ข้อ)');L.appendChild(card(o.d,hs,big&&i<MAX))})}
 s.addEventListener('input',f);s.addEventListener('focus',()=>s.select());
 x.addEventListener('click',()=>{s.value='';f();s.focus()});f();
 </script><script>
