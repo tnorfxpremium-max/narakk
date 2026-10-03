@@ -17,8 +17,13 @@ body{font-family:"Sarabun","Noto Sans Thai",sans-serif;font-size:20px;max-width:
 .a{margin-top:6px;color:var(--ans);font-weight:700;font-size:22px}
 .a:before{content:"✅ "}
 mark{background:var(--mark);color:var(--markfg)}
+
+#x{flex:none;visibility:hidden;font:inherit;font-size:26px;width:58px;border:2px solid var(--acc);border-radius:10px;background:var(--card);color:var(--fg);cursor:pointer}
+.a{margin:8px 0 0;font-size:34px;line-height:1.25}
+.q{font-weight:600;font-size:20px;color:var(--fg)}
+.c{padding:14px 18px}
 </style></head><body>
-<div id="bar"><input id="s" placeholder="พิมพ์ค้นหาโจทย์หรือคำตอบ..." autofocus><button id="t" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span><span class="tx"></span></button></div>
+<div id="bar"><input id="s" placeholder="กรอกคีย์เวิร์ด" autofocus><button id="x" type="button" aria-label="ล้างคำค้น">✕</button><button id="t" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span><span class="tx"></span></button></div>
 <div id="n"></div>
 <div id="l">
 <div class="c"><div class="q">Morroc มีภูมิอากาศแบบใด?</div><div class="a">ภูมิอากาศแบบทะเลทรายเขตร้อน</div></div>
@@ -516,11 +521,21 @@ mark{background:var(--mark);color:var(--markfg)}
 <div class="c"><div class="q">ดอกมอร์นิ่งกลอรี่มักจะบานในตอนเช้าตรู่</div><div class="a">จริง</div></div>
 </div>
 <script>
-const cs=[...document.querySelectorAll('.c')],s=document.getElementById('s'),n=document.getElementById('n');
-function f(){const k=s.value.trim().toLowerCase();let m=0;
-cs.forEach(c=>{const ok=!k||c.textContent.toLowerCase().includes(k);c.style.display=ok?'':'none';if(ok)m++});
-n.textContent='แสดง '+m+' / '+cs.length+' ข้อ'}
-s.addEventListener('input',f);f();
+const L=document.getElementById('l'),s=document.getElementById('s'),n=document.getElementById('n'),x=document.getElementById('x');
+const D=[...L.querySelectorAll('.c')].map(c=>({q:c.querySelector('.q').textContent,a:c.querySelector('.a').textContent}));
+const MAX=8,esc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const alt={x:'[x×*]','*':'[x×*]','×':'[x×*]','/':'[/÷]','÷':'[/÷]','-':'[-−–]','−':'[-−–]'};
+const pat=t=>[...t.replace(/\s+/g,'')].map(ch=>alt[ch.toLowerCase()]||esc(ch)).join('\\s*');
+function hl(p,t,rs){const re=new RegExp('('+rs.map(z=>z.source).join('|')+')','gi');
+t.split(re).forEach((part,i)=>{if(i%2){const m=document.createElement('mark');m.textContent=part;p.appendChild(m)}else p.appendChild(document.createTextNode(part))})}
+function f(){const raw=s.value.trim(),ks=raw.split(/\s+/).filter(Boolean);L.textContent='';x.style.visibility=s.value?'visible':'hidden';
+if(!ks.length){n.textContent='พิมคีย์เวิร์ดโจทย์ที่จะหา โจทย์มี(ทั้งหมด '+D.length+' ข้อ)';return}
+const one=new RegExp(pat(raw),'i');let rs=[one],r=D.filter(d=>one.test(d.q));
+if(!r.length){rs=ks.map(k=>new RegExp(pat(k),'i'));r=D.filter(d=>rs.every(z=>z.test(d.q)))}
+n.textContent=r.length?(r.length>MAX?'พบ '+r.length+' ข้อ แสดง '+MAX+' ข้อแรก — พิมพ์เพิ่มเพื่อให้แคบลง':'พบ '+r.length+' ข้อ'):'ไม่พบ ลองพิมพ์คำอื่น';
+r.slice(0,MAX).forEach(d=>{const c=document.createElement('div');c.className='c';const a=document.createElement('div');a.className='a';a.textContent=d.a;const q=document.createElement('div');q.className='q';hl(q,d.q,rs);c.append(q,a);L.appendChild(c)})}
+s.addEventListener('input',f);s.addEventListener('focus',()=>s.select());
+x.addEventListener('click',()=>{s.value='';f();s.focus()});f();
 </script><script>
 (function(){var r=document.documentElement,b=document.getElementById('t'),mq=matchMedia('(prefers-color-scheme: dark)');
 try{var v=localStorage.getItem('theme');if(v==='dark'||v==='light')r.setAttribute('data-theme',v)}catch(e){}
