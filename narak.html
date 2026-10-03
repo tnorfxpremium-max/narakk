@@ -24,8 +24,30 @@ mark{background:var(--mark);color:var(--markfg)}
 .c{padding:14px 18px}
 .c.top{border:2px solid var(--acc);background:var(--hi)}
 .sec{font-size:16px;font-weight:700;color:var(--mut);margin:14px 0 8px}
+
+body{padding:20px 16px 48px;line-height:1.5}
+#bar{gap:10px;padding:10px 0}
+#s{font-size:20px;padding:13px 16px;border:1.5px solid var(--bd);border-radius:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+#s:focus{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 22%,transparent)}
+#x,.ib{flex:none;width:50px;min-width:0;padding:0;justify-content:center;font:inherit;font-size:20px;border:1.5px solid var(--bd);border-radius:14px;background:var(--card);color:var(--fg);cursor:pointer;display:flex;align-items:center;transition:border-color .2s}
+#x:hover,.ib:hover{border-color:var(--acc)}
+#t .i{font-size:22px;line-height:1}
+#pn{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px 18px;margin:4px 0 8px;font-size:16px}
+#pn[hidden]{display:none}
+#pn label{display:flex;align-items:center;gap:10px;color:var(--mut)}
+#pn input[type=range]{width:130px;accent-color:var(--acc)}
+#pn input[type=color]{width:42px;height:34px;padding:0;border:1px solid var(--bd);border-radius:8px;background:none;cursor:pointer}
+#pn b{min-width:26px;color:var(--fg)}
+#rs{font:inherit;font-size:15px;padding:7px 16px;border:1.5px solid var(--bd);border-radius:10px;background:none;color:var(--mut);cursor:pointer}
+#n{margin:10px 2px 18px;font-size:15px}
+.c{padding:18px 22px;margin-bottom:14px;border:1px solid var(--bd);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.c.top{border:2px solid var(--acc)}
+.q{font-size:var(--qs,20px);color:var(--qc,var(--fg));font-weight:500}
+.a{font-size:var(--as,34px);color:var(--ac,var(--ans));margin-top:10px}
+.sec{margin:24px 2px 12px}
 </style></head><body>
-<div id="bar"><input id="s" placeholder="กรอกคีย์เวิร์ด" autofocus><button id="x" type="button" aria-label="ล้างคำค้น">✕</button><button id="t" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span><span class="tx"></span></button></div>
+<div id="bar"><input id="s" placeholder="กรอกคีย์เวิร์ด" autofocus><button id="x" type="button" aria-label="ล้างคำค้น">✕</button><button id="g" class="ib" type="button" aria-label="ตั้งค่าตัวอักษรและสี">⚙️</button><button id="t" class="ib" type="button" aria-label="สลับโหมดมืด/สว่าง"><span class="i"></span></button></div>
+<div id="pn" hidden><label><span>ขนาดโจทย์</span><input type="range" id="rq" min="14" max="36"><b id="vq"></b></label><label><span>ขนาดคำตอบ</span><input type="range" id="ra" min="18" max="72"><b id="va"></b></label><label><span>สีโจทย์</span><input type="color" id="cq"></label><label><span>สีคำตอบ</span><input type="color" id="ca"></label><button id="rs" type="button">รีเซ็ต</button></div>
 <div id="n"></div>
 <div id="l">
 <div class="c"><div class="q">Morroc มีภูมิอากาศแบบใด?</div><div class="a">ภูมิอากาศแบบทะเลทรายเขตร้อน</div></div>
@@ -543,11 +565,20 @@ r.forEach((o,i)=>{if(big&&i===0)sec('⭐ ตรงที่สุด '+MAX+' ข
 s.addEventListener('input',f);s.addEventListener('focus',()=>s.select());
 x.addEventListener('click',()=>{s.value='';f();s.focus()});f();
 </script><script>
-(function(){var r=document.documentElement,b=document.getElementById('t'),mq=matchMedia('(prefers-color-scheme: dark)');
+(function(){var r=document.documentElement,$=function(i){return document.getElementById(i)},K='prefs',pr={};
 try{var v=localStorage.getItem('theme');if(v==='dark'||v==='light')r.setAttribute('data-theme',v)}catch(e){}
+try{pr=JSON.parse(localStorage.getItem(K))||{}}catch(e){pr={}}
+var mq=matchMedia('(prefers-color-scheme: dark)');
 function dark(){var a=r.getAttribute('data-theme');return a?a==='dark':mq.matches}
-function ui(){var d=dark();b.querySelector('.i').textContent=d?'☀️':'🌙';b.querySelector('.tx').textContent=d?'สว่าง':'มืด'}
-b.onclick=function(){var n=dark()?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}ui()};
-mq.addEventListener&&mq.addEventListener('change',ui);ui()})();
+function save(){try{localStorage.setItem(K,JSON.stringify(pr))}catch(e){}}
+function apply(){r.style.setProperty('--qs',(pr.qs||20)+'px');r.style.setProperty('--as',(pr.as||34)+'px');['qc','ac'].forEach(function(k){pr[k]?r.style.setProperty('--'+k,pr[k]):r.style.removeProperty('--'+k)})}
+function ui(){var d=dark();$('t').querySelector('.i').textContent=d?'☀️':'🌙';
+$('rq').value=pr.qs||20;$('ra').value=pr.as||34;$('vq').textContent=pr.qs||20;$('va').textContent=pr.as||34;
+$('cq').value=pr.qc||(d?'#ececec':'#222222');$('ca').value=pr.ac||(d?'#4ade80':'#0a7a3d')}
+$('t').onclick=function(){var n=dark()?'light':'dark';r.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}ui()};
+$('g').onclick=function(){var p=$('pn');p.hidden=!p.hidden};
+[['rq','qs'],['ra','as'],['cq','qc'],['ca','ac']].forEach(function(m){$(m[0]).oninput=function(){pr[m[1]]=m[1].charAt(1)==='s'?+this.value:this.value;save();apply();ui()}});
+$('rs').onclick=function(){pr={};save();apply();ui()};
+mq.addEventListener&&mq.addEventListener('change',ui);apply();ui()})();
 </script>
 </body></html>
